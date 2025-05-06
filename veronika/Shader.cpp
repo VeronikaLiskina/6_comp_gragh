@@ -136,3 +136,19 @@ void Shader::setVec4(const std::string& name, float x, float y, float z, float w
         std::cerr << "WARNING: Uniform '" << name << "' not found!" << std::endl;
     glUniform4f(location, x, y, z, w);
 }
+// Перегруженные версии setVec3
+void Shader::setVec3(const std::string& name, const glm::vec3& value) const {
+    glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+}
+
+void Shader::setVec3(const std::string& name, float x, float y, float z) const {
+    glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
+}
+
+// Метод для установки матрицы 3x3
+void Shader::setMat3(const std::string& name, const glm::mat3& mat) const {
+    glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+void Shader::setFloat(const std::string& name, float value) const {
+    glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+}

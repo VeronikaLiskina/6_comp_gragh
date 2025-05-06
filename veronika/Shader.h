@@ -24,7 +24,10 @@ public:
     static void SetUniform(GLuint shaderProgram, const std::string& name, int v1, int v2);
     static void SetUniform(GLuint shaderProgram, const std::string& name, int v1, int v2, int v3);
     static void SetUniform(GLuint shaderProgram, const std::string& name, int v1, int v2, int v3, int v4);
-
+    void setVec3(const std::string& name, const glm::vec3& value) const;
+    void setVec3(const std::string& name, float x, float y, float z) const;
+    void setMat3(const std::string& name, const glm::mat3& mat) const;
+    void setFloat(const std::string& name, float value) const;
     static void SetUniformMatrix4(GLuint shaderProgram, const std::string& name, const glm::mat4& matrix);
     void setMat4(const std::string& name, const glm::mat4& mat) const;
     void setVec4(const std::string& name, float x, float y, float z, float w) const;

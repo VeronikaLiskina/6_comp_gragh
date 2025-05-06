@@ -97,15 +97,16 @@ int main() {
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
 
-    // Создание объекта Shader
     Shader shader("vert_shader.glsl", "frag_shader.glsl");
     if (shader.ID == 0) {
         std::cerr << "ERROR: Failed to load shaders." << std::endl;
         return -1;
     }
 
-    // Загрузка модели через Assimp
     Model model1("model.obj");
     if (model1.meshes.empty()) {
         std::cerr << "Ошибка: модель не загружена." << std::endl;
@@ -116,22 +117,40 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
-        // Желтый цвет фона
-        glClearColor(1.0f, 1.0f, 0.3f, 1.0f);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // Серый фон для лучшего контраста
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+            (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         glm::mat4 modelMat = glm::mat4(1.0f);
 
-        // Измененные параметры для лучшего отображения модели
-        modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, 0.0f)); // Убрал смещение вниз
-        modelMat = glm::scale(modelMat, glm::vec3(1.0f)); // Убрал сильное масштабирование
+        // Увеличиваем модель и делаем ее белой
+        modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, 0.0f));
+        modelMat = glm::scale(modelMat, glm::vec3(2.0f)); // Увеличенный размер
 
         shader.use();
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
         shader.setMat4("model", modelMat);
+
+        // Настройки освещения для белого материала
+        shader.setVec3("light.position", 1.2f, 1.0f, 2.0f);
+        shader.setVec3("light.ambient", 0.5f, 0.5f, 0.5f);
+        shader.setVec3("light.diffuse", 0.8f, 0.8f, 0.8f);
+        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        // Белый материал
+        shader.setVec3("material.ambient", 1.0f, 1.0f, 1.0f);
+        shader.setVec3("material.diffuse", 1.0f, 1.0f, 1.0f);
+        shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        shader.setFloat("material.shininess", 32.0f);
+
+        shader.setVec3("viewPos", cameraPos);
+
+        // Нормальная матрица
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelMat)));
+        shader.setMat3("normalMatrix", normalMatrix);
 
         model1.Draw(shader);
 
